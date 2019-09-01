@@ -1,0 +1,9 @@
+name: wonder-gui
+version: "1.0"
+author: Timothée Haudebourg <author@haudebourg.net>
+about: Graphical interface for the Wonder worlds generator.
+args:
+  - verbose:
+      short: v
+      multiple: true
+      help: Sets the level of verbosity.
