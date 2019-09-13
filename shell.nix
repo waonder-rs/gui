@@ -2,6 +2,7 @@ with import <nixpkgs> {};
 
 runCommand "dummy" {
 	buildInputs = [
+		clang
     libGL
 		wayland-protocols
     wayland
