@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 bottle = { path = "../../../../utils/bottle" }
-layout = { path = "../../../../utils/layout", features = ["egl"] }
+layout = { path = "../../../../utils/layout" }
 planutils = { path = "../../../../utils/planutils" }
 paint = { path = "../../../../utils/paint" }
 
