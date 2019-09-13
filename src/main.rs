@@ -81,7 +81,8 @@ impl Render {
 
 impl Layout for Render {
     fn node(&self) -> Remote<layout::Node> {
-        Remote::new(self.scheduler.next_thread(), layout::Node::canvas(self.display, self.context, self.config))
+        // Remote::new(self.scheduler.next_thread(), layout::Node::canvas(self.display, self.context, self.config))
+        Remote::new(self.scheduler.next_thread(), layout::Node::entity(None, None, Vec::new(), Vec::new()))
     }
 }
 
