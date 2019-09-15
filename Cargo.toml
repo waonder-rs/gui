@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 bottle = { path = "../../../../utils/bottle" }
-layout = { path = "../../../../utils/layout" }
+layout = { path = "../../../../utils/layout", features = ["egl"] }
 planutils = { path = "../../../../utils/planutils" }
 paint = { path = "../../../../utils/paint" }
 
@@ -22,6 +22,7 @@ cascading = { path = "../../../../langs/cascading" }
 
 khronos-egl = "1.0.0"
 gl_loader = "*"
+gl = "0.11"
 # queues = "1.0.2"                    # Efficient FIFO Queue data structures
 cassowary = "^0.3.0"                # Cassowary constraint solving algorithm
 enumflags2 = "*"

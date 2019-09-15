@@ -5,6 +5,7 @@ extern crate layout;
 extern crate bottle;
 extern crate render_gl as render;
 extern crate gl_loader;
+extern crate gl;
 extern crate khronos_egl as egl;
 #[macro_use]
 extern crate cascading;
@@ -16,23 +17,31 @@ extern crate stderrlog;
 extern crate clap;
 
 use std::sync::Arc;
-use egl::{EGLDisplay, EGLContext, EGLConfig};
+use egl::{EGLDisplay, EGLContext, EGLConfig, EGLSurface};
 use wabs::{Client, Window};
 use layout::Layout;
-use bottle::{Remote, Scheduler, SimpleScheduler};
+use bottle::{Remote, Handler, Emitter, Sender, Scheduler, SimpleScheduler};
 use pastel::{Context, view::RemoteView};
 
 struct Render {
     display: EGLDisplay,
     context: EGLContext,
     config: EGLConfig,
-    scheduler: Arc<dyn Scheduler>
+    surface: Option<EGLSurface>
+}
+
+unsafe impl Send for Render {}
+unsafe impl Sync for Render {}
+
+struct Renderer {
+    render: Render,
+    view: Remote<layout::Node>
 }
 
 impl Render {
-    fn new(_egl_display: EGLDisplay, scheduler: Arc<dyn Scheduler>) -> Render {
+    fn new(egl_display: EGLDisplay) -> Render {
         egl::bind_api(egl::EGL_OPENGL_API);
-        let egl_display = egl::get_display(egl::EGL_DEFAULT_DISPLAY).unwrap();
+        // let egl_display = egl::get_display(egl::EGL_DEFAULT_DISPLAY).unwrap();
 
         let mut egl_major = 0;
         let mut egl_minor = 0;
@@ -44,7 +53,6 @@ impl Render {
         }
 
         let attributes = [
-            egl::EGL_SURFACE_TYPE, egl::EGL_PBUFFER_BIT,
             egl::EGL_RED_SIZE, 8,
             egl::EGL_GREEN_SIZE, 8,
             egl::EGL_BLUE_SIZE, 8,
@@ -74,15 +82,76 @@ impl Render {
             display: egl_display,
             context: context,
             config: egl_config,
-            scheduler: scheduler
+            surface: None
         }
     }
 }
 
-impl Layout for Render {
-    fn node(&self) -> Remote<layout::Node> {
-        // Remote::new(self.scheduler.next_thread(), layout::Node::canvas(self.display, self.context, self.config))
-        Remote::new(self.scheduler.next_thread(), layout::Node::entity(None, None, Vec::new(), Vec::new()))
+impl Renderer {
+    pub fn new(egl_display: EGLDisplay, scheduler: Arc<dyn Scheduler>) -> (Remote<Renderer>, Remote<layout::Node>) {
+        let model = Render::new(egl_display);
+        let view = Remote::new(scheduler.next_thread(), layout::Node::egl_canvas(model.context, model.config));
+        let renderer = Remote::new(scheduler.next_thread(), Renderer {
+            render: model,
+            view: view.clone()
+        });
+
+        Emitter::<layout::event::EGL>::subscribe(&view, &renderer);
+        Emitter::<layout::event::Geometry>::subscribe(&view, &renderer);
+        Emitter::<layout::event::IO>::subscribe(&view, &renderer);
+        (renderer, view)
+    }
+}
+
+impl Handler<layout::event::EGL> for Renderer {
+    fn handle(&mut self, _sender: Option<Sender>, e: layout::event::EGL) {
+        use layout::event::EGL::*;
+        match e {
+            Mapped(egl_surface) => {
+                egl::make_current(self.render.display, egl_surface, egl_surface, self.render.context);
+
+                unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
+
+                egl::swap_buffers(self.render.display, egl_surface);
+            },
+            Repaint(egl_surface) => {
+                egl::make_current(self.render.display, egl_surface, egl_surface, self.render.context);
+
+                unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
+
+                egl::swap_buffers(self.render.display, egl_surface);
+            }
+        }
+    }
+}
+
+impl Handler<layout::event::Geometry> for Renderer {
+    fn handle(&mut self, _sender: Option<Sender>, e: layout::event::Geometry) {
+        use layout::event::Geometry::*;
+        match e {
+            Resize(new_size) => {
+                println!("resized to {}", new_size);
+            }
+        }
+    }
+}
+
+impl Handler<layout::event::IO> for Renderer {
+    fn handle(&mut self, _sender: Option<Sender>, e: layout::event::IO) {
+        use layout::event::IO::*;
+        match e {
+            Mouse(e) => {
+                use layout::event::io::Mouse::*;
+                match e {
+                    Move(pos) => {
+                        println!("move mouse to {}", pos);
+                    },
+                    Button => {
+                        println!("press button");
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -108,8 +177,7 @@ fn main() {
     let ctx = Context::new(&display, &scheduler);
     // ctx.style().load(css_load!("style.css"));
 
-    let render = Render::new(display.egl_display(), ctx.scheduler().clone());
-	let node = render.node();
+    let (renderer, node) = Renderer::new(display.egl_display(), ctx.scheduler().clone());
 	let view = pastel::View::new(node, &ctx);
 
 	view.show();
