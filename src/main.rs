@@ -21,7 +21,7 @@ use egl::{EGLDisplay, EGLContext, EGLConfig, EGLSurface};
 use wabs::{Client, Window};
 use layout::Layout;
 use bottle::{Remote, Handler, Emitter, Sender, Scheduler, SimpleScheduler};
-use pastel::{Context, view::RemoteView};
+use pastel::{view::RemoteView};
 
 struct Render {
     display: EGLDisplay,
@@ -146,8 +146,11 @@ impl Handler<layout::event::IO> for Renderer {
                     Move(pos) => {
                         println!("move mouse to {}", pos);
                     },
-                    Button => {
-                        println!("press button");
+                    Button { button, state } => {
+                        println!("button: {:?} {:?}", button, state);
+                    }
+                    Axis { axis, value } => {
+                        println!("axis: {:?} {:?}", axis, value);
                     }
                 }
             }
@@ -174,7 +177,7 @@ fn main() {
     load_egl(&display);
 
     // create Pastel context.
-    let ctx = Context::new(&display, &scheduler);
+    let ctx = pastel::Context::new(&display, &scheduler);
     // ctx.style().load(css_load!("style.css"));
 
     let (renderer, node) = Renderer::new(display.egl_display(), ctx.scheduler().clone());
