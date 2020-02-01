@@ -7,18 +7,18 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bottle = { path = "../../../../utils/bottle" }
-layout = { path = "../../../../utils/layout", features = ["egl"] }
-planutils = { path = "../../../../utils/planutils" }
-paint = { path = "../../../../utils/paint" }
+bottle = { path = "../../../utils/design/bottle" }
+layout = { path = "../../../utils/design/layout", features = ["egl"] }
+planutils = { path = "../../../utils/graphics/planutils" }
+paint = { path = "../../../utils/graphics/paint" }
 
-render-gl = { path = "../../../../ui/g/render/gl" }
-pastel = { path = "../../../../ui/g/pastel" }
-wabs = { path = "../../../../ui/g/wabs", features = ["egl", "render"] }
-wabs-desktop = { path = "../../../../ui/g/wabs-desktop" }
-wabs-wayland = { path = "../../../../ui/g/wabs-wayland", features = ["egl"] }
+render-gl = { path = "../../../utils/graphics/render/gl" }
+pastel = { path = "../../../ui/g/pastel" }
+wabs = { path = "../../../ui/g/wabs/core", features = ["egl", "render"] }
+wabs-desktop = { path = "../../../ui/g/wabs/desktop" }
+wabs-wayland = { path = "../../../ui/g/wabs/wayland", features = ["egl"] }
 
-cascading = { path = "../../../../langs/cascading" }
+cascading = { path = "../../../langs/cascading" }
 
 khronos-egl = "1.0.0"
 gl_loader = "*"
