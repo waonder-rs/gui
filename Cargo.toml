@@ -20,7 +20,7 @@ wabs-wayland = { path = "../../../ui/g/wabs/wayland", features = ["egl"] }
 
 cascading = { path = "../../../langs/cascading" }
 
-khronos-egl = "1.0.0"
+khronos-egl = "1.0.1"
 gl_loader = "*"
 gl = "0.11"
 # queues = "1.0.2"                    # Efficient FIFO Queue data structures
