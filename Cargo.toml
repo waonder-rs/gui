@@ -17,8 +17,11 @@ pastel = { path = "../../../ui/g/pastel" }
 wabs = { path = "../../../ui/g/wabs/core", features = ["egl", "render"] }
 wabs-desktop = { path = "../../../ui/g/wabs/desktop" }
 wabs-wayland = { path = "../../../ui/g/wabs/wayland", features = ["egl"] }
-
 cascading = { path = "../../../langs/cascading" }
+
+# Wonder core.
+wonder = { path = "../core" }
+engine = { path = "../../engine" }
 
 khronos-egl = "1.0.1"
 gl_loader = "*"
