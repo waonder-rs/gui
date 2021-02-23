@@ -5,9 +5,13 @@ authors = ["Timothée Haudebourg <wonder@haudebourg.net>"]
 edition = "2018"
 
 [dependencies]
-vulkano = "^0.20"
-vulkano-win = "^0.20"
+log = "*"
+stderrlog = "*"
+
+wonder = { path = "../core" }
+magma = { path = "../../../utils/graphics/magma" }
 winit = "^0.24"
-async-std = { version = "*", features = ["attributes"] }
-engine = { path = "../../engine" }
+scene = { path = "../../utils/scene" }
+cycles = { path = "../../utils/cycles" }
+engine = { path = "../../utils/engine" }
 bottle = { path = "../../../utils/design/bottle" }
