@@ -6,6 +6,7 @@ use magma::{
 	instance::{
 		PhysicalDevice
 	},
+	device,
 	Device,
 	Format,
 	framebuffer::{
@@ -25,7 +26,7 @@ pub struct Surface<W> {
 }
 
 impl<W> Surface<W> {
-	pub fn new(physical_device: PhysicalDevice, inner: W) -> Self {
+	pub fn new(device: &Arc<Device>, presentation_queue: device::Queue, inner: W) -> Self {
 		panic!("TODO")
 	}
 }
